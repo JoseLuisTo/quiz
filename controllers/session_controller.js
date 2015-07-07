@@ -22,6 +22,8 @@ exports.create = function(req, res) {
     var login     = req.body.login;
     var password  = req.body.password;
 
+    req.session.horaExpira = (new Date()).getTime() + 60000;
+
     var userController = require('./user_controller');
     userController.autenticar(login, password, function(error, user) {
 

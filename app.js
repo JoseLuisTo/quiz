@@ -30,7 +30,24 @@ app.use(session());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Helpers dinamicos:
+// Autologout
+app.use(function(req, res, next){
+  var tInactivo = 60000; // maximo sin actividad 60 segundos -> 1 minuto 
+  if (req.session.user) {  //Comprobamos que si esta logado
+    if (req.session.horaExpira > (new Date()).getTime()) { //Coge la hora que lleva de sesion y mira si ha expirado
+        req.session.horaExpira = (new Date()).getTime() + tInactivo;
+        next();
+    } 
+    else { // Si la sesion ha expirado la destruimos
+      delete req.session.user;
+      next()
+    }
+  } 
+  else { //Sin login
+    next(); 
+  }
+});
+
 app.use(function(req, res, next) {
 
   // guardar path en session.redir para despues de login
